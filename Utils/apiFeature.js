@@ -1,0 +1,69 @@
+import { ethers } from "ethers";
+
+import Web3Modal from "web3modal";
+
+import { ChatAppABI, ChatAppAddress } from "../Context/constants";
+
+export const CheckIfWalletConnected = async () => {
+  try {
+    if (!window.ethereum) return "Please install metamask extension";
+    const accounts = await window.ethereum.request({ method: "eth_accounts" });
+
+    const firstAccount = accounts[0];
+    return firstAccount;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const connectWallet = async () => {
+  try {
+    if (!window.ethereum) return "Please install metamask extension";
+
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    const firstAccount = accounts[0];
+    return firstAccount;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const fetchContract = (provider) => {
+  return new ethers.Contract(ChatAppAddress, ChatAppABI, provider);
+};
+
+export const connectingWithContract = async () => {
+  try {
+    const web3modal = new Web3Modal();
+    const connection = await web3modal.connect();
+
+    const provider = new ethers.providers.Web3Provider(connection);
+
+    const signer = provider.getSigner();
+    const contract = fetchContract(signer);
+    return contract;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const converTime = (time) => {
+  const newTime = new Date(time.toNumber());
+
+  const realTime =
+    newTime.getHours() +
+    "/" +
+    newTime.getMinutes() +
+    "/" +
+    newTime.getSeconds() +
+    "  Date:" +
+    newTime.getDate() +
+    "/" +
+    (newTime.getMonth() + 1) +
+    "/" +
+    newTime.getFullYear();
+
+  return realTime;
+};
